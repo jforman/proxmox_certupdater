@@ -87,7 +87,7 @@ def main():
         log_level = logging.DEBUG
     else:
         log_level = logging.INFO
-    logging.basicConfig(format='%(asctime)s,%(levelname)s,%(message)s', level=log_level)
+    logging.basicConfig(format=f'%(asctime)s,%(process)d,%(levelname)s,node:{args.node},%(message)s', level=log_level)
     logging.info(f'Starting Proxmox Certupdater.')
     if args.update_wait_hours < 0:
         logging.error(f'Invalid duration: {args.update_wait_hours}. Value must be 0 or greater.')
