@@ -1,0 +1,50 @@
+---
+# https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: certupdater-proxmox
+  namespace: default
+spec:
+  schedule: "@weekly"
+  successfulJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: certupdater-proxmox      
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: certupdater-pve1
+            image: jforman/proxmox_certupdater:latest
+            imagePullPolicy: Always
+            command:
+            - ./certupdater.py
+            args:
+            - --auth=/proxmox-creds/proxmox-certupdater-apitoken.txt
+            - --cert_dir=/certs
+            - --destination=pve1.proxmox.lan
+            - --node=moon1
+            volumeMounts:
+            - name: proxmox-creds
+              mountPath: "/proxmox-creds"
+              readOnly: true
+            - name: proxmox-certs
+              mountPath: "/certs"
+              readOnly: true            
+            volumeMounts:
+            - name: proxmox-creds
+              mountPath: "/proxmox-creds"
+              readOnly: true
+            - name: proxmox-certs
+              mountPath: "/certs"
+              readOnly: true
+          volumes:
+          - name: proxmox-creds
+            secret:
+              secretName: proxmox-certupdater-api-key
+          - name: proxmox-certs
+            secret:
+              secretName: proxmox-prod-tls
