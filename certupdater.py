@@ -24,6 +24,7 @@ parser.add_argument("--auth", dest="auth_filepath",
                     help="Config file containing Proxmox API authentication data.")
 parser.add_argument("--debug", dest="debug", action='store_true')
 parser.add_argument("--destination", dest="destination", help="Destination for sending API calls.")
+parser.add_argument("--dry_run", action="store_true", help="Enable dry-run mode.")
 parser.add_argument("--node", dest="node", help="Node name of Proxmox VE node.")
 parser.add_argument("--cert_dir", dest="cert_dir", default="/cert",
                     help="Directory containing tls.{crt,key}.")
@@ -74,6 +75,9 @@ def update_node(rpc_destination, node_name, auth_filepath, cert_dir):
         'restart': 1,
     }
 
+    if args.dry_run:
+        logging.info(f"DRY RUN: Will not actually call {rpc_destination} to update certificate for node {node_name}.")
+        return
     logging.info(f'Calling {rpc_destination} to update TLS certificate for node {node_name}.')
     p_out = p.nodes(node_name).certificates.custom.post(**cert_options)
     logging.info(f'Certificate update output: {p_out}.')
