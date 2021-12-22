@@ -12,6 +12,8 @@ import configparser
 import logging
 import os
 import sys
+import time
+
 from proxmoxer import ProxmoxAPI
 
 parser = argparse.ArgumentParser(
@@ -25,8 +27,8 @@ parser.add_argument("--destination", dest="destination", help="Destination for s
 parser.add_argument("--node", dest="node", help="Node name of Proxmox VE node.")
 parser.add_argument("--cert_dir", dest="cert_dir", default="/cert",
                     help="Directory containing tls.{crt,key}.")
-parser.add_argument("--update-interval", dest="update_interval", type=float, default=0,
-                    help="Duration in hours between certificate updates. 0 is one execution and quit.")
+parser.add_argument("--update_wait_hours", dest="update_wait_hours", type=float, default=0,
+                    help="Hours to sleep between certificate updates. 0 is one execution and quit.")
 args = parser.parse_args()
 
 
@@ -83,16 +85,16 @@ def main():
         log_level = logging.INFO
     logging.basicConfig(format='%(asctime)s,%(levelname)s,%(message)s', level=log_level)
     logging.info(f'Starting Proxmox Certupdater.')
-    if args.update_interval < 0:
-        logging.error(f'Invalid duration: {args.update_interval}. Value must be 0 or greater.')
+    if args.update_wait_hours < 0:
+        logging.error(f'Invalid duration: {args.update_wait_hours}. Value must be 0 or greater.')
         sys.exit(1)
 
     while True:
         update_node(args.destination, args.node, args.auth_filepath, args.cert_dir)
-        if args.update_interval == 0:
+        if args.update_wait_hours == 0:
             sys.exit(0)
-        logging.info('Sleeping {args.update_interval} hours until next iteration.')
-        time.sleep(3600 * args.update_interval)
+        logging.info(f"Sleeping {args.update_wait_hours} hours until next iteration.")
+        time.sleep(3600 * args.update_wait_hours)
 
 if __name__ == "__main__":
     main()
