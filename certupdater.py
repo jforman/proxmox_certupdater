@@ -4,8 +4,6 @@
 https://pve.proxmox.com/pve-docs/api-viewer/index.html#/nodes/{node}/certificates/custom
 """
 
-# TODO: proxmox authentication. reading in the API key (stored in a k8s secret)
-
 import argparse
 import base64
 import configparser
@@ -49,9 +47,11 @@ def read_cert(cert_dir):
     cert = ""
     key = ""
     with open(os.path.join(cert_dir, "tls.crt"), 'r') as f:
-        cert = base64.b64decode(f.read())
+        logging.info("Reading TLS cert.")
+        cert = f.read()
     with open(os.path.join(cert_dir, "tls.key"), 'r') as f:
-        key = base64.b64decode(f.read())
+        logging.info("Reading TLS key.")
+        key = f.read()
 
     logging.debug(f"tls.key: {key}")
     logging.debug(f"tls.crt: {cert}")
