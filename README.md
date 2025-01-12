@@ -14,7 +14,7 @@ Using certmanager provided TLS certificats from Lets Encrypt, update the TLS cer
 # Usage
 ## Kubernetes
 
-certificate yaml
+### certificate yaml
 
 ```yaml
 ---
@@ -37,7 +37,7 @@ spec:
 
 I have requested a certificate with multiple DNS names on it. Why? proxmox.local.lan is a virtual IP shared among keepalived and haproxy, which provides TCP loadbalancing between the pve hosts. This way I can acess the cluster via https://proxmox.local.lan or via the node-specific https://pve1.local.lan FQDNs using the same certificate.
 
-cronjob yaml
+### cronjob yaml
 
 ```yaml
 ---
@@ -88,6 +88,18 @@ spec:
 The pod running the container must have access to both the TLS certificates and the proxmox API key secrets in Kubernetes. 
 
 Destination is an DNS name or IP address of the host running the PVE instance which the API call will be sent. Node is the name of the PVE name within the cluster.
+
+### config
+
+A simple configuration is needed to provide API access information to the Proxmox cluster. This information is configured in the Proxmox UI.
+
+```
+[default]
+user = someuser@pve
+id = sometoken
+secret = someguid
+```
+
 # Notes
 
 ## Manually scheduling 
